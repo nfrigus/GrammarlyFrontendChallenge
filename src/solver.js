@@ -1,5 +1,6 @@
 import { Graph, astar } from "javascript-astar"
 
+
 /**
  * Find a shortes path from start to end
  *
@@ -13,19 +14,21 @@ import { Graph, astar } from "javascript-astar"
  * @returns {floor: number, room: number}[] - shortest path from `start` to `end`
  */
 export function solve(times, start, end) {
-  times = times.slice().reverse()
-  const building = new Graph(times)
-  const liftPosition = building.grid[start.floor][start.room]
-  const liftDestionation = building.grid[end.floor][end.room]
+  try {
+    times = times.slice().reverse()
+    const building = new Graph(times)
+    const liftPosition = building.grid[start.floor][start.room]
+    const liftDestionation = building.grid[end.floor][end.room]
 
-  return astar.search(
-    building,
-    liftPosition,
-    liftDestionation,
-  ).map(i => ({
-    floor: i.x,
-    room: i.y,
-  }));
+    return astar.search(
+      building,
+      liftPosition,
+      liftDestionation,
+    ).map(i => ({
+      floor: i.x,
+      room: i.y,
+    }));
+  } catch (e) {
+    return []
+  }
 }
-
-window.solve = solve

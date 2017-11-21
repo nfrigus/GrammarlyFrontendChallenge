@@ -1,13 +1,21 @@
-import { solve } from "./solver";
-import { times } from "./data";
+import React from 'react'
+import { render } from 'react-dom'
+import { solve } from './solver'
+import { times } from './data'
+import App from './components/App'
 
-window.go = () => {
-  const res = solve(
-    times,
-    { floor: window.currentFloor.value, room: window.currentRoom.value },
-    { floor: window.nextFloor.value, room: window.nextRoom.value }
-  )
 
-  window.currentFloor.value = window.nextFloor.value
-  window.currentRoom.value = window.nextRoom.value
-};
+const app = <App times={times} />
+
+
+Object.assign(window, {
+  go: app.go,
+  solve,
+  times,
+})
+
+
+render(
+  app,
+  document.getElementById('root'),
+)
