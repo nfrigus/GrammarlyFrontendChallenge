@@ -5,17 +5,13 @@ import { times } from './data'
 import App from './components/App'
 
 
-const app = <App times={times} />
-
+const app = render(
+  <App times={times} />,
+  document.getElementById('root'),
+)
 
 Object.assign(window, {
   go: app.go,
   solve,
   times,
 })
-
-
-render(
-  app,
-  document.getElementById('root'),
-)
