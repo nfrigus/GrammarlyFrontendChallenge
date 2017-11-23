@@ -5,10 +5,11 @@ import PropTypes from 'prop-types'
 export default class MatrixInputCell extends React.PureComponent {
   static propTypes = {
     active: PropTypes.bool,
+    elevator: PropTypes.bool,
     matrix: PropTypes.any.isRequired,
+    position: PropTypes.arrayOf(Number).isRequired,
     readonly: PropTypes.bool,
     value: PropTypes.any,
-    position: PropTypes.arrayOf(Number).isRequired,
   }
   static defaultProps = {
     active: false,
@@ -25,8 +26,10 @@ export default class MatrixInputCell extends React.PureComponent {
     textAlign: 'center',
   }
   styleActive = {
-    ...this.styleDefault,
     border: '1px solid #000',
+  }
+  styleElevator = {
+    boxShadow: '0px 0px 25px inset',
   }
 
   componentDidMount = this.focus
@@ -74,9 +77,10 @@ export default class MatrixInputCell extends React.PureComponent {
   }
 
   render() {
-    const style = this.props.active
-      ? this.styleActive
-      : this.styleDefault
+    let style = this.styleDefault
+
+    if (this.props.active) style = { ...style, ...this.styleActive }
+    if (this.props.elevator) style = { ...style, ...this.styleElevator }
 
     return (
       <input
