@@ -49,7 +49,7 @@ export default class App extends React.Component {
   }
 
   getTimes() {
-    return this.refs.matrix.getRows()
+    return this.refs.matrix.getRows().map(row => row.map(cell => +cell))
   }
   getLiftPath() {
     const {
