@@ -71,30 +71,68 @@ export default class App extends React.Component {
     return (
       <div>
         <form onSubmit={this.go}>
-          <label>Current Floor: <input readOnly value={liftPosition.floor} size="3" /></label>
-          <label>Current Room: <input readOnly value={liftPosition.room} size="3" /></label>
-          <br />
-          <br />
-          <label>Next Floor:
-            <input
-              type="number"
-              min="0"
-              max="99"
-              value={liftDestination.floor}
-              onChange={e => this.updateDestination('floor', e)} />
-          </label>
-          <label>Next Room:
-            <input
-              type="number"
-              min="0"
-              max="99"
-              value={liftDestination.room}
-              onChange={e => this.updateDestination('room', e)} />
-          </label>
-          <button type="submit">Go</button>
+          <table>
+            <thead>
+            <tr>
+              <td></td>
+              <td>Floor</td>
+              <td>Room</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>Current position</td>
+              <td>
+                <Input
+                  readOnly
+                  value={liftPosition.floor}
+                />
+              </td>
+              <td>
+                <Input
+                  readOnly
+                  value={liftPosition.room}
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Destination {" "}
+                <button type="submit">Go</button>
+              </td>
+              <td>
+                <Input
+                  value={liftDestination.floor}
+                  onChange={e => this.updateDestination('floor', e)}
+                />
+              </td>
+              <td>
+                <Input
+                  value={liftDestination.room}
+                  onChange={e => this.updateDestination('room', e)}
+                />
+              </td>
+            </tr>
+            </tbody>
+          </table>
         </form>
-        <MatrixInput ref="matrix" columns={transpose(this.props.times)} />
+        <MatrixInput
+          ref="matrix"
+          columns={transpose(this.props.times)}
+          liftPosition={liftPosition}
+          liftDestination={liftDestination}
+        />
       </div>
     )
   }
+}
+
+function Input(attr) {
+  return <input
+    style={{ width: '3em' }}
+    type="number"
+    min="0"
+    max="99"
+    {...attr}
+  />
 }
