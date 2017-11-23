@@ -4,103 +4,72 @@ import MatrixCell from './MatrixInputCell'
 import { transpose } from '../lib/matrix'
 
 
-/**
- * Based on https://github.com/oal/react-matrix
- */
 export class MatrixInput extends React.Component {
   static propTypes = {
-    columns: PropTypes.array,
+    columns: PropTypes.arrayOf(Array),
+    rows: PropTypes.arrayOf(Array),
     resize: PropTypes.oneOf(['both', 'vertical', 'horizontal', 'none']),
     readonly: PropTypes.bool,
   }
-  constructor(props) {
-    super(props)
+  static defaultProps = {
+    rows: [[0]],
+    resize: 'both',
+    readonly: false,
+  }
+  style = {
+    overflow: 'hidden',
+    display: 'inline-block',
+    borderLeft: '2px solid #333',
+    borderRight: '2px solid #333',
+    padding: '0 2px',
+    borderRadius: '4px',
+  }
+  state = {
+    activeCell: [-1, -1],
+    caret: 0,
+    columns: this.props.columns || transpose(this.props.rows),
+  }
 
-    this.state = {
-      activeCell: [-1, -1],
-      caret: 0,
-      columns: props.columns || transpose(props.rows),
-    }
-
-    this.style = {
-      overflow: 'hidden',
-      display: 'inline-block',
-      borderLeft: '2px solid #333',
-      borderRight: '2px solid #333',
-      padding: '0 2px',
-      borderRadius: '4px',
-    }
+  isResizeableX() {
+    return !this.props.readonly && [
+      'horizontal',
+      'both',
+    ].includes(this.props.resize)
+  }
+  isResizeableY() {
+    return !this.props.readonly && [
+      'vertical',
+      'both',
+    ].includes(this.props.resize)
+  }
+  isRowEmpty(row) {
+    return this.state.columns.every(col => !String(col[row]).length)
+  }
+  isColumnEmpty(col) {
+    return this.state.columns[col].every(cell => !String(cell).length)
   }
 
   getHeight() {
     return this.state.columns[0].length
   }
-
   getWidth() {
     return this.state.columns.length
+  }
+  getColumns() {
+    return this.state.columns
+  }
+  getRows() {
+    return transpose(this.state.columns)
   }
 
   getCellValue(x, y) {
     if (x < 0 || y < 0 || x > this.getWidth() - 1 || y > this.getHeight() - 1) return ''
     return this.state.columns[x][y]
   }
-
   setCellValue(x, y, val) {
     let columns = this.state.columns
     columns[x][y] = isNaN(+val) ? '' : +val
     this.setState({ columns })
-  }
-
-  getColumn(n) {
-    return this.state.columns[n]
-  }
-
-  setColumn(n, values) {
-    let columns = this.state.columns
-    columns[n] = values
-    this.setState({ columns: columns })
-  }
-
-  getColumns() {
-    return this.state.columns
-  }
-
-  getRow(n) {
-    const row = []
-    const columns = this.state.columns
-    for (let i = 0; i < columns.length; i++) {
-      row[i] = columns[i][n]
-    }
-
-    return row
-  }
-
-  setRow(n, values) {
-    let columns = this.state.columns
-    for (let i = 0; i < values.length; i++) {
-      columns[i][n] = values[i]
-    }
-
-    this.setState({ columns: columns })
-  }
-
-  getRows() {
-    let rows = []
-    for (let i = 0; i < this.getHeight(); i++) {
-      rows[i] = this.getRow(i)
-    }
-
-    return rows
-  }
-
-  isResizeableX() {
-    let resize = this.props.resize
-    return (!this.props.readonly && (resize === 'horizontal' || resize === 'both' || resize === undefined))
-  }
-
-  isResizeableY() {
-    let resize = this.props.resize
-    return (!this.props.readonly && (resize === 'vertical' || resize === 'both' || resize === undefined))
   }
 
   moveCell(dx, dy) {
@@ -123,7 +92,6 @@ export class MatrixInput extends React.Component {
 
     this.setCell(caretPos, cellX, cellY)
   }
-
   setCell(caret, cellX, cellY) {
     if (caret === null) {
       return this.setState({
@@ -156,67 +124,24 @@ export class MatrixInput extends React.Component {
   }
 
   addRow() {
-    let columns = this.state.columns
-    for (let i = 0; i < columns.length; i++) {
-      columns[i].push('')
-    }
-
-    this.setState({
-      height: this.getHeight() + 1,
-      columns: columns,
-    })
+    const { columns } = this.state
+    columns.forEach(col => col.push(''))
+    this.setState({ columns })
   }
-
-  addColumn() {
-    let columns = this.state.columns
-    let newColumn = new Array(this.getHeight())
-    for (let i = 0; i < newColumn.length; i++) {
-      newColumn[i] = ''
-    }
-
-    columns.push(newColumn)
-
-    this.setState({
-      width: this.state.width + 1,
-      columns: columns,
-    })
-  }
-
-  isRowEmpty(row) {
-    for (let i = 0; i < this.state.columns.length; i++) {
-      let col = this.state.columns[i]
-      if (('' + col[col.length - 1]).length > 0) {
-        return false
-      }
-    }
-
-    return true
-  }
-
-  isColumnEmpty(col) {
-    let column = this.state.columns[col]
-    for (let i = 0; i < column.length; i++) {
-      if (('' + column[i]).length > 0) return false
-    }
-
-    return true
-  }
-
   removeRow(row) {
-    for (let i = 0; i < this.state.columns.length; i++) {
-      this.state.columns[i].splice(row, 1)
-    }
-
-    this.setState({
-      columns: this.state.columns,
-    })
+    const { columns } = this.state
+    columns.forEach(col => col.splice(row, 1))
+    this.setState({ columns })
   }
-
+  addColumn() {
+    const { columns } = this.state
+    columns.push(new Array(this.getHeight()).fill(''))
+    this.setState({ columns })
+  }
   removeColumn(col) {
-    this.state.columns.splice(col, 1)
-    this.setState({
-      columns: this.state.columns,
-    })
+    const { columns } = this.state
+    columns.splice(col, 1)
+    this.setState({ columns })
   }
 
   truncate(cellX, cellY) {

@@ -13,6 +13,7 @@ export default class MatrixInputCell extends React.PureComponent {
   }
   static defaultProps = {
     active: false,
+    elevator: false,
     readonly: false,
     value: '',
   }
