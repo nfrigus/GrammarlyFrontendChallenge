@@ -27,7 +27,9 @@ export default class App extends React.Component {
       floor: 0,
       room: 0,
     },
+    times: this.props.times,
   }
+
   getTimes() {
     return this.refs.matrix.getRows()
   }
@@ -56,6 +58,10 @@ export default class App extends React.Component {
     return path
   }
 
+  onCellActive = (coords, rows) => this.setState({
+    liftDestination: toggleFloorCoords(coords, rows),
+    times: rows,
+  })
   updateDestination(type, event) {
     const { liftDestination } = this.state
     liftDestination[type] = +event.target.value
@@ -66,63 +72,63 @@ export default class App extends React.Component {
     const {
       liftPosition,
       liftDestination,
+      times,
     } = this.state
 
     return (
-      <div>
-        <form onSubmit={this.go}>
-          <table>
-            <thead>
-            <tr>
-              <td></td>
-              <td>Floor</td>
-              <td>Room</td>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-              <td>Current position</td>
-              <td>
-                <Input
-                  readOnly
-                  value={liftPosition.floor}
-                />
-              </td>
-              <td>
-                <Input
-                  readOnly
-                  value={liftPosition.room}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                Destination {" "}
-                <button type="submit">Go</button>
-              </td>
-              <td>
-                <Input
-                  value={liftDestination.floor}
-                  onChange={e => this.updateDestination('floor', e)}
-                />
-              </td>
-              <td>
-                <Input
-                  value={liftDestination.room}
-                  onChange={e => this.updateDestination('room', e)}
-                />
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </form>
+      <form onSubmit={this.go}>
+        <table>
+          <thead>
+          <tr>
+            <td></td>
+            <td>Floor</td>
+            <td>Room</td>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>Current position</td>
+            <td>
+              <Input
+                readOnly
+                value={liftPosition.floor}
+              />
+            </td>
+            <td>
+              <Input
+                readOnly
+                value={liftPosition.room}
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Destination {" "}
+              <button type="submit">Go</button>
+            </td>
+            <td>
+              <Input
+                value={liftDestination.floor}
+                onChange={e => this.updateDestination('floor', e)}
+              />
+            </td>
+            <td>
+              <Input
+                value={liftDestination.room}
+                onChange={e => this.updateDestination('room', e)}
+              />
+            </td>
+          </tr>
+          </tbody>
+        </table>
         <MatrixInput
           ref="matrix"
-          columns={transpose(this.props.times)}
-          liftPosition={liftPosition}
-          liftDestination={liftDestination}
+          columns={transpose(times)}
+          liftPosition={toggleFloorCoords(liftPosition, times)}
+          liftDestination={toggleFloorCoords(liftDestination, times)}
+          onCellActive={this.onCellActive}
         />
-      </div>
+      </form>
     )
   }
 }
@@ -135,4 +141,21 @@ function Input(attr) {
     max="99"
     {...attr}
   />
+}
+
+/**
+ * Converts { floor: x, room: y } to [x, y] and vise versa
+ * @param input
+ */
+function toggleFloorCoords(coords, matrix) {
+  const h = matrix.length - 1
+  if (Array.isArray(coords)) {
+    const [x, y] = coords
+    return {
+      floor: h - y,
+      room: x,
+    }
+  } else {
+    return [coords.room, h - coords.floor]
+  }
 }

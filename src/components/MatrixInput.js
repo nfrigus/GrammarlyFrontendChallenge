@@ -153,6 +153,7 @@ export class MatrixInput extends React.Component {
       caret: caret,
       activeCell: [cellX, cellY],
     })
+    this.props.onCellActive([cellX, cellY], this.getRows())
   }
 
   addRow() {
@@ -229,23 +230,21 @@ export class MatrixInput extends React.Component {
     }
   }
 
-  floorIndex(floor) {
-    return this.getHeight() - 1 - floor
-  }
-
   render() {
-    const {
-      liftPosition,
+    let { activeCell } = this.state
+    let {
       liftDestination,
+      liftPosition,
     } = this.props
 
-    const activeCell = this.state.activeCell.join('-')
+    activeCell = activeCell.join('-')
+    liftDestination = liftDestination.join('-')
+    liftPosition = liftPosition.join('-')
 
     const columns = this.state.columns.map((column, x) => {
       const cells = column.map((value, y) => {
         const position = [x, y]
         const key = position.join('-')
-        const elevator = liftPosition.room === x && this.floorIndex(liftPosition.floor) === y
         return (
           <MatrixCell
             key={key}
@@ -254,7 +253,8 @@ export class MatrixInput extends React.Component {
             position={position}
             active={activeCell === key}
             readonly={this.props.readonly}
-            elevator={elevator}
+            elevator={liftPosition === key}
+            destination={liftDestination === key}
           />
         )
       })
