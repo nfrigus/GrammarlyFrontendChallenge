@@ -1,6 +1,5 @@
 import React from 'react'
 import MatrixInput from './MatrixInput'
-import { transpose } from '../lib/matrix'
 import { solve } from '../solver'
 
 
@@ -141,7 +140,7 @@ export default class App extends React.Component {
         </table>
         <MatrixInput
           ref="matrix"
-          columns={transpose(times)}
+          rows={times}
           liftPosition={toggleFloorCoords(liftPosition, times)}
           liftDestination={toggleFloorCoords(liftDestination, times)}
           onCellActive={this.onCellActive}

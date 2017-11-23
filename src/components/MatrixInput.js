@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import MatrixCell from './MatrixInputCell'
+import { transpose } from '../lib/matrix'
 
 
 /**
@@ -18,7 +19,7 @@ export class MatrixInput extends React.Component {
     this.state = {
       activeCell: [-1, -1],
       caret: 0,
-      columns: this.props.columns,
+      columns: props.columns || transpose(props.rows),
     }
 
     this.style = {
