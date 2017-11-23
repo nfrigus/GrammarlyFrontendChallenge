@@ -5,8 +5,10 @@ import { solve } from '../solver'
 
 
 export default class App extends React.Component {
+  speed = 5 // ms
   go = e => {
     e.preventDefault()
+    if (this.state.path.length) return;
 
     const path = this.getLiftPath()
 
@@ -14,9 +16,25 @@ export default class App extends React.Component {
       return alert(path.error)
     }
 
-    console.table(path)
+    this.setState({ path }, () => this.move())
+  }
+  move() {
+    const {
+      path,
+      times,
+    } = this.state
 
-    this.setState({ liftPosition: path.pop() })
+    if (!path.length) return
+
+    const liftPosition = path.shift()
+    const [x, y] = toggleFloorCoords(liftPosition, times)
+    const delay = times[y][x] * this.speed
+
+    setTimeout(() => this.move(), delay)
+    this.setState({
+      liftPosition,
+      path,
+    })
   }
   state = {
     liftPosition: {
@@ -28,6 +46,7 @@ export default class App extends React.Component {
       room: 0,
     },
     times: this.props.times,
+    path: [],
   }
 
   getTimes() {
@@ -44,8 +63,6 @@ export default class App extends React.Component {
       &&
       liftPosition.room === liftDestination.room
     ) return { error: 'Already there!' }
-
-    console.table(this.getTimes())
 
     const path = solve(
       this.getTimes(),
@@ -73,6 +90,7 @@ export default class App extends React.Component {
       liftPosition,
       liftDestination,
       times,
+      path,
     } = this.state
 
     return (
@@ -127,6 +145,7 @@ export default class App extends React.Component {
           liftPosition={toggleFloorCoords(liftPosition, times)}
           liftDestination={toggleFloorCoords(liftDestination, times)}
           onCellActive={this.onCellActive}
+          readonly={!!path.length}
         />
       </form>
     )

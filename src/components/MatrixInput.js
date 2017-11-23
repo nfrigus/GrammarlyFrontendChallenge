@@ -46,10 +46,8 @@ export class MatrixInput extends React.Component {
 
   setCellValue(x, y, val) {
     let columns = this.state.columns
-    columns[x][y] = +val
-    this.setState({
-      columns: columns,
-    })
+    columns[x][y] = isNaN(+val) ? '' : +val
+    this.setState({ columns })
   }
 
   getColumn(n) {
