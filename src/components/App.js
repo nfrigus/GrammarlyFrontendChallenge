@@ -109,6 +109,21 @@ export default class App extends React.Component {
     matrix.setColumns(columns)
   }
 
+  renderLegend() {
+    return (
+      <ul>
+        <li>The matrix above represents the building with rooms-cell.</li>
+        <li>The gray cell is the current position of the lift.</li>
+        <li>The cell value is time lift requires passing the room.</li>
+        <li>Zero or empty values are not passable.</li>
+        <li>Click any cell to set lift destination.</li>
+        <li>Use keyboard arrow keys to navigate cells or extend building size.</li>
+        <li>Press enter or 'Go' button to trigger lift movement to a destination with a time-optimal route.</li>
+        <li>Your changes to the building structure are saved to localStorage and will be loaded on next visit.</li>
+        <li>Have fun.</li>
+      </ul>
+    )
+  }
   render() {
     const {
       liftDestination,
@@ -198,6 +213,7 @@ export default class App extends React.Component {
           onCellActive={this.onCellActive}
           readonly={!!path.length}
         />
+        {this.renderLegend()}
       </form>
     )
   }
