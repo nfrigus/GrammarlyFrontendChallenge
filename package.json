@@ -3,6 +3,7 @@
   "description": "Starter for Grammarly Frontend Challenge, see readme.md for details.",
   "version": "0.0.0",
   "dependencies": {
+    "ion-sound": "^3.0.7",
     "javascript-astar": "^0.4.1",
     "prop-types": "^15.6.0",
     "react": "^16.1.1",

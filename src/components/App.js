@@ -1,7 +1,10 @@
 import React from 'react'
+import 'ion-sound'
 import MatrixInput from './MatrixInput'
 import { solve } from '../solver'
 
+
+const { sound } = window.ion
 
 export default class App extends React.Component {
   speed = 5 // ms
@@ -33,7 +36,7 @@ export default class App extends React.Component {
     this.setState({
       liftPosition,
       path,
-    })
+    }, () => sound.play('bing'))
   }
   state = {
     liftPosition: {
@@ -46,6 +49,15 @@ export default class App extends React.Component {
     },
     times: this.props.times,
     path: [],
+  }
+
+  componentDidMount() {
+    sound({
+      sounds: [{ name: "bing" }],
+      path: "/",
+      preload: true,
+      multiplay: true,
+    })
   }
 
   getTimes() {
