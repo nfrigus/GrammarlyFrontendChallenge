@@ -7,7 +7,6 @@ import { solve } from '../solver'
 const { sound } = window.ion
 
 export default class App extends React.Component {
-  speed = 5 // ms
   go = e => {
     e.preventDefault()
     if (this.state.path.length) return;
@@ -24,39 +23,43 @@ export default class App extends React.Component {
     const {
       path,
       times,
+      speed,
+      mute,
     } = this.state
 
     if (!path.length) return
 
     const liftPosition = path.shift()
     const [x, y] = toggleFloorCoords(liftPosition, times)
-    const delay = times[y][x] * this.speed
+    const delay = times[y][x] * speed
 
     setTimeout(() => this.move(), delay)
     this.setState({
       liftPosition,
       path,
-    }, () => sound.play('bing'))
+    }, () => mute || sound.play('bing'))
   }
   state = {
-    liftPosition: {
-      floor: 0,
-      room: 0,
-    },
     liftDestination: {
       floor: 0,
       room: 0,
     },
-    times: this.props.times,
+    liftPosition: {
+      floor: 0,
+      room: 0,
+    },
+    mute: false,
     path: [],
+    speed: 5,
+    times: this.props.times,
   }
 
   componentDidMount() {
     sound({
-      sounds: [{ name: "bing" }],
+      multiplay: true,
       path: "/",
       preload: true,
-      multiplay: true,
+      sounds: [{ name: "bing" }],
     })
   }
 
@@ -95,17 +98,49 @@ export default class App extends React.Component {
     liftDestination[type] = +event.target.value
     this.setState({ liftDestination })
   }
+  randomizeRoomTimes = () => {
+    const { matrix } = this.refs
+    let columns = matrix.getColumns()
+    columns = columns.map(col => col.map(cell => Math.round(Math.random() * 100)))
+    matrix.setColumns(columns)
+  }
 
   render() {
     const {
-      liftPosition,
       liftDestination,
-      times,
+      liftPosition,
+      mute,
       path,
+      speed,
+      times,
     } = this.state
 
     return (
       <form onSubmit={this.go}>
+        <table>
+          <tbody>
+          <tr>
+            <td><label htmlFor="input-sound-mute">Mute sound</label></td>
+            <td><input
+              id="input-sound-mute" type="checkbox" checked={mute}
+              onChange={e => this.setState({ mute: e.target.checked })}
+            /></td>
+          </tr>
+          <tr>
+            <td><label htmlFor="input-animation-speed">Tick duration, ms</label></td>
+            <td><Input
+              id="input-animation-speed" min="1" max="100" value={speed} required
+              onChange={e => this.setState({ speed: +e.target.value || 0 })}
+            /></td>
+          </tr>
+          <tr>
+            <td colSpan="2">
+              <button type="button" onClick={this.randomizeRoomTimes}>Randomize room times</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <br />
         <table>
           <thead>
           <tr>
@@ -150,6 +185,7 @@ export default class App extends React.Component {
           </tr>
           </tbody>
         </table>
+        <br />
         <MatrixInput
           ref="matrix"
           rows={times}

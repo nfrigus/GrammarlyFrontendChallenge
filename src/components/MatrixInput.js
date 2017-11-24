@@ -122,6 +122,9 @@ export class MatrixInput extends React.Component {
     })
     this.props.onCellActive([cellX, cellY], this.getRows())
   }
+  setColumns(columns) {
+    this.setState({ columns })
+  }
 
   addRow() {
     const { columns } = this.state
