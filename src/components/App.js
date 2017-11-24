@@ -2,6 +2,7 @@ import React from 'react'
 import 'ion-sound'
 import MatrixInput from './MatrixInput'
 import { solve } from '../solver'
+import storage from '../lib/localStorage'
 
 
 const { sound } = window.ion
@@ -89,10 +90,13 @@ export default class App extends React.Component {
     return path
   }
 
-  onCellActive = (coords, rows) => this.setState({
-    liftDestination: toggleFloorCoords(coords, rows),
-    times: rows,
-  })
+  onCellActive = (coords, rows) => {
+    storage.set('times', rows)
+    this.setState({
+      liftDestination: toggleFloorCoords(coords, rows),
+      times: rows,
+    })
+  }
   updateDestination(type, event) {
     const { liftDestination } = this.state
     liftDestination[type] = +event.target.value
